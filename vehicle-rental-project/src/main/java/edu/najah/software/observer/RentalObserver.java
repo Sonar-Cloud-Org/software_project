@@ -1,7 +1,7 @@
 package edu.najah.software.observer;
 
-import edu.najah.software.model.RentalRecord;
 import edu.najah.software.model.Customer;
+import edu.najah.software.model.RentalRecord;
 import edu.najah.software.model.Vehicle;
 
 
