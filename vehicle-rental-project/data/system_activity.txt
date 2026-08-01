@@ -1,0 +1,7 @@
+[2026-07-12] Manager Dashboard Initialized.
+[2026-07-12] Transaction Returned: R-B095C37C | Vehicle: V003 -> Paid Cost: $0.0
+[2026-07-12] Vehicle Registered: V008 | Type: Motorcycle | Brand: aadas | Model: sa | Plate: saa | Daily Rate: $10.0
+[2026-07-12] Manager Dashboard Initialized.
+[2026-07-12] Alert: Email sent to [test@test]: Urgent: Your rental for vehicle V001 is OVERDUE by 3 day(s).
+[2026-07-12] Expiry Warning Dispatched: Urgent: Your rental for vehicle V001 is OVERDUE by 3 day(s).
+[2026-07-12] Transaction Returned: R-D1192D8E | Vehicle: V001 -> Paid Cost: $225.0
