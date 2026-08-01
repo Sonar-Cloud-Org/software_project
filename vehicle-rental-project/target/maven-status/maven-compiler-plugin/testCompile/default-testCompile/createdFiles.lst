@@ -1,0 +1,5 @@
+edu\najah\software\AppTest.class
+edu\najah\software\service\CatalogServiceTest.class
+edu\najah\software\service\RentalServiceTest.class
+edu\najah\software\repository\RepositoryTest.class
+edu\najah\software\service\AuthenticationServiceTest.class

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileRentalRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=٤;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">vehicle-rental-project</a> &gt; <a href="index.source.html" class="el_package">edu.najah.software.repository</a> &gt; <span class="el_source">FileRentalRepository.java</span></div><h1>FileRentalRepository.java</h1><pre class="source lang-java linenums">package edu.najah.software.repository;
+
+import edu.najah.software.model.RentalRecord;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+
+public class FileRentalRepository implements RentalRepository {
+
+    
+    private final String filePath;
+
+    
+    public FileRentalRepository() {
+<span class="nc" id="L21">        this(&quot;data&quot;);</span>
+<span class="nc" id="L22">    }</span>
+
+    
+<span class="fc" id="L25">    public FileRentalRepository(String dataDir) {</span>
+        try {
+<span class="fc" id="L27">            Files.createDirectories(Paths.get(dataDir));</span>
+<span class="nc" id="L28">        } catch (IOException e) {</span>
+            
+<span class="fc" id="L30">        }</span>
+<span class="fc" id="L31">        this.filePath = dataDir + File.separator + &quot;rentals.txt&quot;;</span>
+<span class="fc" id="L32">    }</span>
+
+    
+    @Override
+    public List&lt;RentalRecord&gt; findAll() {
+<span class="fc" id="L37">        List&lt;RentalRecord&gt; records = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L38">        File file = new File(filePath);</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (!file.exists()) {</span>
+<span class="fc" id="L40">            return records;</span>
+        }
+
+<span class="fc" id="L43">        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {</span>
+            String line;
+<span class="fc bfc" id="L45" title="All 2 branches covered.">            while ((line = reader.readLine()) != null) {</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">                if (line.trim().isEmpty()) {</span>
+<span class="nc" id="L47">                    continue;</span>
+                }
+<span class="fc" id="L49">                String[] parts = line.split(&quot;\\|&quot;);</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">                if (parts.length &gt;= 8) {</span>
+<span class="fc" id="L51">                    String rentalId = parts[0];</span>
+<span class="fc" id="L52">                    String customerId = parts[1];</span>
+<span class="fc" id="L53">                    String vehicleId = parts[2];</span>
+<span class="fc" id="L54">                    LocalDate rentalDate = LocalDate.parse(parts[3]);</span>
+<span class="fc" id="L55">                    LocalDate expectedReturnDate = LocalDate.parse(parts[4]);</span>
+                    
+<span class="fc" id="L57">                    LocalDate actualReturnDate = null;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">                    if (!parts[5].equalsIgnoreCase(&quot;null&quot;)) {</span>
+<span class="fc" id="L59">                        actualReturnDate = LocalDate.parse(parts[5]);</span>
+                    }
+                    
+<span class="fc" id="L62">                    double totalCost = Double.parseDouble(parts[6]);</span>
+<span class="fc" id="L63">                    boolean isClosed = Boolean.parseBoolean(parts[7]);</span>
+
+<span class="fc" id="L65">                    RentalRecord record = new RentalRecord(rentalId, customerId, vehicleId, rentalDate, expectedReturnDate);</span>
+<span class="fc" id="L66">                    record.setActualReturnDate(actualReturnDate);</span>
+<span class="fc" id="L67">                    record.setTotalCost(totalCost);</span>
+<span class="fc" id="L68">                    record.setClosed(isClosed);</span>
+
+<span class="fc" id="L70">                    records.add(record);</span>
+                }
+<span class="fc" id="L72">            }</span>
+<span class="nc" id="L73">        } catch (IOException | IllegalArgumentException e) {</span>
+            
+<span class="fc" id="L75">        }</span>
+<span class="fc" id="L76">        return records;</span>
+    }
+
+    
+    @Override
+    public Optional&lt;RentalRecord&gt; findById(String rentalId) {
+<span class="fc" id="L82">        return findAll().stream()</span>
+<span class="fc" id="L83">                .filter(r -&gt; r.getRentalId().equalsIgnoreCase(rentalId))</span>
+<span class="fc" id="L84">                .findFirst();</span>
+    }
+
+    
+    @Override
+    public void save(RentalRecord record) {
+<span class="fc" id="L90">        List&lt;RentalRecord&gt; records = findAll();</span>
+<span class="fc" id="L91">        records.removeIf(r -&gt; r.getRentalId().equalsIgnoreCase(record.getRentalId()));</span>
+<span class="fc" id="L92">        records.add(record);</span>
+<span class="fc" id="L93">        writeAll(records);</span>
+<span class="fc" id="L94">    }</span>
+
+    
+    private void writeAll(List&lt;RentalRecord&gt; records) {
+<span class="fc" id="L98">        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            for (RentalRecord r : records) {</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">                String actualReturn = r.getActualReturnDate() != null ? r.getActualReturnDate().toString() : &quot;null&quot;;</span>
+<span class="fc" id="L101">                writer.write(r.getRentalId() + &quot;|&quot; +</span>
+<span class="fc" id="L102">                        r.getCustomerId() + &quot;|&quot; +</span>
+<span class="fc" id="L103">                        r.getVehicleId() + &quot;|&quot; +</span>
+<span class="fc" id="L104">                        r.getRentalDate() + &quot;|&quot; +</span>
+<span class="fc" id="L105">                        r.getExpectedReturnDate() + &quot;|&quot; +</span>
+                        actualReturn + &quot;|&quot; +
+<span class="fc" id="L107">                        r.getTotalCost() + &quot;|&quot; +</span>
+<span class="fc" id="L108">                        r.isClosed());</span>
+<span class="fc" id="L109">                writer.newLine();</span>
+<span class="fc" id="L110">            }</span>
+<span class="nc" id="L111">        } catch (IOException e) {</span>
+            
+<span class="fc" id="L113">        }</span>
+<span class="fc" id="L114">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
