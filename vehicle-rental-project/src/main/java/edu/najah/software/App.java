@@ -1,13 +1,10 @@
 package edu.najah.software;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+import edu.najah.software.presentation.MainApp;
+import javafx.application.Application;
+
+public class App {
+    public static void main( String[] args ) {
+        Application.launch(MainApp.class, args);
     }
 }
