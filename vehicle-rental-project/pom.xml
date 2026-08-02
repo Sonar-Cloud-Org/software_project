@@ -19,6 +19,9 @@
     <sonar.organization>mohammed-hafaytha</sonar.organization>
     <sonar.projectKey>mohammed-hafaytha_software_project</sonar.projectKey>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.coverage.jacoco.xmlReportPaths>
+      target/site/jacoco/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
     <sonar.coverage.exclusions>**/presentation/**,**/App.java</sonar.coverage.exclusions>
   </properties>
 
