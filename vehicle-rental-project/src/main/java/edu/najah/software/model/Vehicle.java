@@ -117,4 +117,5 @@ public abstract class Vehicle {
      * @return the string name of the vehicle type
      */
     public abstract String getVehicleType();
+
 }
