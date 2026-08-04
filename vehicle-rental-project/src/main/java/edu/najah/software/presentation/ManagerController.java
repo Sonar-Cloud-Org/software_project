@@ -192,73 +192,118 @@ public class ManagerController implements RentalObserver {
         customersTable.setItems(FXCollections.observableArrayList(customerRepo.findAll()));
     }
 
-    
+
+    private String requiredText(TextField field, String fieldName) {
+        String value = field.getText();
+
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    fieldName + " is required."
+            );
+        }
+
+        return value.trim();
+    }
+
+
+    private double parsePositiveDouble(String value, String fieldName) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    fieldName + " is required."
+            );
+        }
+
+        try {
+            double number = Double.parseDouble(value.trim());
+
+            if (number <= 0) {
+                throw new IllegalArgumentException(
+                        fieldName + " must be greater than zero."
+                );
+            }
+
+            return number;
+
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    fieldName + " must be a valid number."
+            );
+        }
+    }
+
+
+    private Vehicle createVehicleFromForm() {
+        String type = vehTypeCombo.getValue();
+        String id = requiredText(vehIdField, "Vehicle ID");
+        String brand = requiredText(vehBrandField, "Brand");
+        String model = requiredText(vehModelField, "Model");
+        String plate = requiredText(vehPlateField, "License plate");
+
+        double rate = parsePositiveDouble(
+                vehRateField.getText(),
+                "Daily rate"
+        );
+
+        return VehicleFactory.create(
+                type,
+                id,
+                brand,
+                model,
+                plate,
+                rate,
+                true,
+                parsePositiveDouble(
+                        vehBattField.getText(),
+                        "Battery percentage"
+                )
+        );
+    }
+
+
+    private void clearVehicleForm() {
+        vehIdField.clear();
+        vehBrandField.clear();
+        vehModelField.clear();
+        vehPlateField.clear();
+        vehRateField.clear();
+        vehBattField.setText("100");
+    }
+
+
     @FXML
     private void handleSaveVehicle(ActionEvent event) {
-        String type = vehTypeCombo.getValue();
-        String id = vehIdField.getText().trim();
-        String brand = vehBrandField.getText().trim();
-        String model = vehModelField.getText().trim();
-        String plate = vehPlateField.getText().trim();
-        String rateStr = vehRateField.getText().trim();
-        String battStr = vehBattField.getText().trim();
-
-        if (id.isEmpty() || brand.isEmpty() || model.isEmpty() || plate.isEmpty() || rateStr.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Missing Data", "Please fill in all standard fields.");
-            return;
-        }
-
-        double rate;
         try {
-            rate = Double.parseDouble(rateStr);
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Invalid Data", "Daily rate must be a valid number.");
-            return;
-        }
+            Vehicle vehicle = createVehicleFromForm();
 
-        Vehicle v;
-        switch (type) {
-            case "Car":
-                v = new Car(id, brand, model, plate, rate, true);
-                break;
-            case "Motorcycle":
-                v = new Motorcycle(id, brand, model, plate, rate, true);
-                break;
-            case "Van":
-                v = new Van(id, brand, model, plate, rate, true);
-                break;
-            case "Truck":
-                v = new Truck(id, brand, model, plate, rate, true);
-                break;
-            case "ElectricVehicle":
-                double battery = 100.0;
-                try {
-                    battery = Double.parseDouble(battStr);
-                } catch (NumberFormatException ex) {
-                    
-                }
-                v = new ElectricVehicle(id, brand, model, plate, rate, true, battery);
-                break;
-            default:
-                return;
-        }
+            catalogService.addVehicle(vehicle);
 
-        try {
-            catalogService.addVehicle(v);
-            appendLog("Vehicle Registered: " + id + " | Type: " + type + " | Brand: " + brand + " | Model: " + model + " | Plate: " + plate + " | Daily Rate: $" + rate);
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Vehicle registered successfully.");
+            appendLog("Vehicle Registered: "
+                    + vehicle.getVehicleId()
+                    + " | Type: "
+                    + vehicle.getVehicleType());
 
-            
-            vehIdField.setText("");
-            vehBrandField.setText("");
-            vehModelField.setText("");
-            vehPlateField.setText("");
-            vehRateField.setText("");
-            vehBattField.setText("100");
+            AlertHelper.show(
+                    Alert.AlertType.INFORMATION,
+                    "Success",
+                    "Vehicle registered successfully."
+            );
 
+            clearVehicleForm();
             refreshAllTables();
+
+        } catch (IllegalArgumentException e) {
+            AlertHelper.show(
+                    Alert.AlertType.ERROR,
+                    "Invalid Vehicle Data",
+                    e.getMessage()
+            );
+
         } catch (AuthenticationException e) {
-            showAlert(Alert.AlertType.ERROR, "Access Denied", "Authentication Error: " + e.getMessage());
+            AlertHelper.show(
+                    Alert.AlertType.ERROR,
+                    "Access Denied",
+                    e.getMessage()
+            );
         }
     }
 
@@ -267,12 +312,12 @@ public class ManagerController implements RentalObserver {
     private void handleProcessReturn(ActionEvent event) {
         RentalRecord selected = rentalsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "No Selection", "Please select an active rental transaction from the table.");
+            AlertHelper.show(Alert.AlertType.WARNING, "No Selection", "Please select an active rental transaction from the table.");
             return;
         }
 
         if (selected.isClosed()) {
-            showAlert(Alert.AlertType.WARNING, "Transaction Closed", "This rental record is already closed.");
+            AlertHelper.show(Alert.AlertType.WARNING, "Transaction Closed", "This rental record is already closed.");
             return;
         }
 
@@ -303,10 +348,10 @@ public class ManagerController implements RentalObserver {
                     actualDuration, lateDays, record.getTotalCost()
             );
 
-            showAlert(Alert.AlertType.INFORMATION, "Return Invoice Summary", invoice);
+            AlertHelper.show(Alert.AlertType.INFORMATION, "Return Invoice Summary", invoice);
             refreshAllTables();
         } catch (RentalException e) {
-            showAlert(Alert.AlertType.ERROR, "Return Failed", e.getMessage());
+            AlertHelper.show(Alert.AlertType.ERROR, "Return Failed", e.getMessage());
         }
     }
 
@@ -318,14 +363,14 @@ public class ManagerController implements RentalObserver {
 
         List<String> logs = notificationService.getSentNotifications();
         if (logs.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "Alert Trigger", "No rentals require warnings today.");
+            AlertHelper.show(Alert.AlertType.INFORMATION, "Alert Trigger", "No rentals require warnings today.");
         } else {
             StringBuilder sb = new StringBuilder("Notifications Dispatched successfully:\n\n");
             for (String logMsg : logs) {
                 sb.append(logMsg).append("\n");
                 appendLog("Alert: " + logMsg);
             }
-            showAlert(Alert.AlertType.WARNING, "Alerts Sent", sb.toString());
+            AlertHelper.show(Alert.AlertType.WARNING, "Alerts Sent", sb.toString());
         }
     }
 
@@ -384,17 +429,9 @@ public class ManagerController implements RentalObserver {
         }
     }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
-    
-    
-    
+
+
     @Override
     public void onRentalCreated(RentalRecord record, Customer customer, Vehicle vehicle) {
         Platform.runLater(() -> {

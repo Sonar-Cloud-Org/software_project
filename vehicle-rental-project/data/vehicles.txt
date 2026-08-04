@@ -1,9 +1,8 @@
-Truck|V004|Volvo|FH16|TRK-789|150.0|true
 ElectricVehicle|V005|Tesla|Model 3|EV-111|100.0|true|85.0
 Truck|V006|mazda|aa|123-aab|100.0|true
-Car|V009|bmw|m5|r74p|200.0|true
-Van|V003|Ford|Transit|VAN-456|80.0|true
 Motorcycle|V008|aadas|sa|saa|10.0|true
-Car|V001|Toyota|Corolla|ABC-123|50.0|true
 Motorcycle|V010|Volv|FH17|ATC-023|1000.0|true
 Motorcycle|V002|Yamaha|YZF-R3|MTC-999|40.0|true
+Van|V003|Ford|Transit|VAN-456|80.0|true
+Car|V009|bmw|m5|r74p|200.0|false
+Car|V001|Toyota|Corolla|ABC-123|50.0|true

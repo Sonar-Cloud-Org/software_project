@@ -47,7 +47,7 @@ public class LoginController {
         String pass = passField.getText().trim();
 
         if (idOrUser.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Please enter your Username or Customer ID.");
+            AlertHelper.show(Alert.AlertType.ERROR, "Error", "Please enter your Username or Customer ID.");
             return;
         }
 
@@ -63,7 +63,7 @@ public class LoginController {
                 passField.setText("");
                 mainApp.showCustomerScreen(customer);
             } else {
-                showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid password for Customer: " + idOrUser);
+                AlertHelper.show(Alert.AlertType.ERROR, "Login Failed", "Invalid password for Customer: " + idOrUser);
             }
         } else {
             
@@ -72,7 +72,7 @@ public class LoginController {
                 passField.setText("");
                 mainApp.showManagerScreen();
             } else {
-                showAlert(Alert.AlertType.ERROR, "Login Failed", 
+                AlertHelper.show(Alert.AlertType.ERROR, "Login Failed",
                         "ID, Username, or Password invalid.");
             }
         }
@@ -137,14 +137,14 @@ public class LoginController {
             String password = passF.getText().trim();
 
             if (name.isEmpty() || email.isEmpty() || ageStr.isEmpty() || password.isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Registration Error", "All fields are required.");
+                AlertHelper.show(Alert.AlertType.ERROR, "Registration Error", "All fields are required.");
                 return;
             }
 
             
             String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
             if (!email.matches(emailRegex)) {
-                showAlert(Alert.AlertType.ERROR, "Registration Error", "Please enter a valid email address (e.g. name@domain.com).");
+                AlertHelper.show(Alert.AlertType.ERROR, "Registration Error", "Please enter a valid email address (e.g. name@domain.com).");
                 return;
             }
 
@@ -152,7 +152,7 @@ public class LoginController {
             try {
                 age = Integer.parseInt(ageStr);
             } catch (NumberFormatException e) {
-                showAlert(Alert.AlertType.ERROR, "Registration Error", "Age must be a valid number.");
+                AlertHelper.show(Alert.AlertType.ERROR, "Registration Error", "Age must be a valid number.");
                 return;
             }
 
@@ -161,16 +161,8 @@ public class LoginController {
             Customer newCustomer = new Customer(nextId, name, email, age, license, password);
             customerRepo.save(newCustomer);
 
-            showAlert(Alert.AlertType.INFORMATION, "Success", 
+            AlertHelper.show(Alert.AlertType.INFORMATION, "Success",
                     "Registration Successful!\nYour Login Customer ID is: " + nextId + "\nPassword: " + password);
         }
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

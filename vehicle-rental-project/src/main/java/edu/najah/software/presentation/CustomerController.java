@@ -163,7 +163,7 @@ public class CustomerController implements RentalObserver {
         String durationStr = durationField.getText().trim();
 
         if (vid == null || vid.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Select Vehicle", "Please select a vehicle to book.");
+            AlertHelper.show(Alert.AlertType.WARNING, "Select Vehicle", "Please select a vehicle to book.");
             return;
         }
 
@@ -171,19 +171,19 @@ public class CustomerController implements RentalObserver {
         try {
             duration = Integer.parseInt(durationStr);
         } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Invalid Duration", "Please enter a valid numeric number of days.");
+            AlertHelper.show(Alert.AlertType.ERROR, "Invalid Duration", "Please enter a valid numeric number of days.");
             return;
         }
 
         try {
             RentalRecord record = rentalService.rentVehicle(activeCustomer.getCustomerId(), vid, duration);
-            showAlert(Alert.AlertType.INFORMATION, "Booking Success", 
+            AlertHelper.show(Alert.AlertType.INFORMATION, "Booking Success",
                     "Vehicle rented successfully!\nTransaction ID: " + record.getRentalId() +
                     "\nExpected return date: " + record.getExpectedReturnDate());
 
             durationField.setText("");
         } catch (RentalException e) {
-            showAlert(Alert.AlertType.WARNING, "Booking Rejected", "Rental Rejected: " + e.getMessage());
+            AlertHelper.show(Alert.AlertType.WARNING, "Booking Rejected", "Rental Rejected: " + e.getMessage());
         }
     }
 
@@ -211,13 +211,5 @@ public class CustomerController implements RentalObserver {
     @Override
     public void onExpiryReminderSent(RentalRecord record, Customer customer, String message) {
         
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

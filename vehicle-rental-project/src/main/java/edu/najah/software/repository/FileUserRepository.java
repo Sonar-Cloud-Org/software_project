@@ -25,7 +25,10 @@ public class FileUserRepository implements UserRepository {
         try {
             Files.createDirectories(Paths.get(dataDir));
         } catch (IOException e) {
-            
+            throw new IllegalStateException(
+                    "Failed to create the data directory.",
+                    e
+            );
         }
         this.filePath = dataDir + File.separator + "users.txt";
         initializeDefaultData();
@@ -60,7 +63,10 @@ public class FileUserRepository implements UserRepository {
                 }
             }
         } catch (IOException e) {
-            
+            throw new IllegalStateException(
+                    "Failed to read users from file.",
+                    e
+            );
         }
         return managers;
     }
@@ -90,7 +96,10 @@ public class FileUserRepository implements UserRepository {
                 writer.newLine();
             }
         } catch (IOException e) {
-            
+            throw new IllegalStateException(
+                    "Failed to save users to file.",
+                    e
+            );
         }
     }
 }

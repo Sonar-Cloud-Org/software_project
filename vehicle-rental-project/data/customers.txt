@@ -7,3 +7,4 @@ C006|test|test@test|31|REGULAR|123123
 C007|test1|teast@gmail.com|33|HEAVY|123
 C008|josseh|josseh@test|3|REGULAR|123
 C009|mohammed|mohmof113@gmail.com|21|HEAVY|0592932661
+C0010|test test tester|testt@gmail.com|12|HEAVY|123

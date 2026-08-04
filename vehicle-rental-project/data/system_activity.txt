@@ -5,3 +5,14 @@
 [2026-07-12] Alert: Email sent to [test@test]: Urgent: Your rental for vehicle V001 is OVERDUE by 3 day(s).
 [2026-07-12] Expiry Warning Dispatched: Urgent: Your rental for vehicle V001 is OVERDUE by 3 day(s).
 [2026-07-12] Transaction Returned: R-D1192D8E | Vehicle: V001 -> Paid Cost: $225.0
+[2026-08-04] Manager Dashboard Initialized.
+[2026-08-04] Transaction Returned: R-5B4B843E | Vehicle: V003 -> Paid Cost: $0.0
+[2026-08-04] Manager Dashboard Initialized.
+[2026-08-05] Manager Dashboard Initialized.
+[2026-08-05] Expiry Warning Dispatched: Reminder: Your rental for vehicle V009 is due today (2026-08-05).
+[2026-08-05] Transaction Returned: R-FDA3D354 | Vehicle: V001 -> Paid Cost: $50.0
+[2026-08-06] Alert: Email sent to [josseh@test]: Urgent: Your rental for vehicle V009 is OVERDUE by 1 day(s).
+[2026-08-06] Expiry Warning Dispatched: Urgent: Your rental for vehicle V009 is OVERDUE by 1 day(s).
+[2026-08-04] Manager Dashboard Initialized.
+[2026-08-04] Vehicle Registered: V004 | Type: Motorcycle
+[2026-08-04] Manager Dashboard Initialized.
