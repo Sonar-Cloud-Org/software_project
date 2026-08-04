@@ -16,6 +16,8 @@ import java.util.List;
 
 public class MainApp extends Application {
 
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(MainApp.class.getName());
+
     private AuthenticationService authService;
     private CatalogService catalogService;
     private RentalService rentalService;
@@ -85,7 +87,7 @@ public class MainApp extends Application {
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(java.util.logging.Level.SEVERE, "Error loading login screen", e);
         }
     }
 
@@ -105,7 +107,7 @@ public class MainApp extends Application {
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(java.util.logging.Level.SEVERE, "Error loading manager screen", e);
         }
     }
 
@@ -125,7 +127,7 @@ public class MainApp extends Application {
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(java.util.logging.Level.SEVERE, "Error loading customer screen", e);
         }
     }
 }
