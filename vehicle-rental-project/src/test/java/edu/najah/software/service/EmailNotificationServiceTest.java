@@ -37,8 +37,7 @@ public class EmailNotificationServiceTest {
     @Test
     public void testOnExpiryReminderSentAndDeDuplication() {
         String msg = "Your rental is due today.";
-        
-        // First reminder
+
         service.onExpiryReminderSent(record, customer, msg);
         
         List<String> list = service.getSentNotifications();
@@ -46,17 +45,14 @@ public class EmailNotificationServiceTest {
         assertTrue(list.get(0).contains("john@example.com"));
         assertTrue(list.get(0).contains(msg));
 
-        // Duplicate reminder on same day
         service.onExpiryReminderSent(record, customer, msg);
-        
-        // Size should still be 1 (de-duplicated)
+
         List<String> list2 = service.getSentNotifications();
         assertEquals(1, list2.size());
     }
 
     @Test
     public void testOnRentalCreatedAndReturnedNoOps() {
-        // These are blank observer operations (no-ops), calling them should not throw or log anything
         assertDoesNotThrow(() -> service.onRentalCreated(record, customer, vehicle));
         assertDoesNotThrow(() -> service.onRentalReturned(record, customer, vehicle));
         assertTrue(service.getSentNotifications().isEmpty());
