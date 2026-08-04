@@ -279,4 +279,96 @@ public class RentalServiceTest {
         verify(rentalObserver, times(1)).onExpiryReminderSent(eq(record), eq(standardCustomer), messageCaptor.capture());
         assertTrue(messageCaptor.getValue().contains("OVERDUE by 2 day"));
     }
+
+    @Test
+    public void testRemoveObserver() throws RentalException {
+        rentalService.removeObserver(rentalObserver);
+        
+        RentalRecord record = rentalService.rentVehicle("C001", "V001", 5);
+        assertNotNull(record);
+        
+        verify(rentalObserver, never()).onRentalCreated(any(), any(), any());
+    }
+
+    @Test
+    public void testRentVehicleCustomerNotFound() {
+        when(customerRepository.findById("UNKNOWN_CUST")).thenReturn(Optional.empty());
+
+        RentalException exception = assertThrows(RentalException.class, () -> {
+            rentalService.rentVehicle("UNKNOWN_CUST", "V001", 5);
+        });
+        assertTrue(exception.getMessage().contains("Customer not found"));
+    }
+
+    @Test
+    public void testRentVehicleVehicleNotFound() {
+        when(vehicleRepository.findById("UNKNOWN_VEH")).thenReturn(Optional.empty());
+
+        RentalException exception = assertThrows(RentalException.class, () -> {
+            rentalService.rentVehicle("C001", "UNKNOWN_VEH", 5);
+        });
+        assertTrue(exception.getMessage().contains("Vehicle not found"));
+    }
+
+    @Test
+    public void testReturnVehicleRecordNotFound() {
+        when(rentalRepository.findById("UNKNOWN_RENT")).thenReturn(Optional.empty());
+
+        RentalException exception = assertThrows(RentalException.class, () -> {
+            rentalService.returnVehicle("UNKNOWN_RENT");
+        });
+        assertTrue(exception.getMessage().contains("Rental record not found"));
+    }
+
+    @Test
+    public void testReturnVehicleAlreadyClosed() {
+        RentalRecord record = new RentalRecord("R002", "C001", "V001", LocalDate.now(), LocalDate.now().plusDays(5));
+        record.setClosed(true);
+        when(rentalRepository.findById("R002")).thenReturn(Optional.of(record));
+
+        RentalException exception = assertThrows(RentalException.class, () -> {
+            rentalService.returnVehicle("R002");
+        });
+        assertTrue(exception.getMessage().contains("already completed and closed"));
+    }
+
+    @Test
+    public void testReturnVehicleVehicleNotFound() {
+        RentalRecord record = new RentalRecord("R003", "C001", "UNKNOWN_VEH", LocalDate.now(), LocalDate.now().plusDays(5));
+        when(rentalRepository.findById("R003")).thenReturn(Optional.of(record));
+        when(vehicleRepository.findById("UNKNOWN_VEH")).thenReturn(Optional.empty());
+
+        RentalException exception = assertThrows(RentalException.class, () -> {
+            rentalService.returnVehicle("R003");
+        });
+        assertTrue(exception.getMessage().contains("Vehicle not found"));
+    }
+
+    @Test
+    public void testReturnVehicleCustomerNotFound() {
+        RentalRecord record = new RentalRecord("R004", "UNKNOWN_CUST", "V001", LocalDate.now(), LocalDate.now().plusDays(5));
+        when(rentalRepository.findById("R004")).thenReturn(Optional.of(record));
+        when(vehicleRepository.findById("V001")).thenReturn(Optional.of(car));
+        when(customerRepository.findById("UNKNOWN_CUST")).thenReturn(Optional.empty());
+
+        RentalException exception = assertThrows(RentalException.class, () -> {
+            rentalService.returnVehicle("R004");
+        });
+        assertTrue(exception.getMessage().contains("Customer not found"));
+    }
+
+    @Test
+    public void testRentalExpiryWarningCustomerNotFound() {
+        RentalRecord record = new RentalRecord("R005", "UNKNOWN_CUST", "V001", 
+                LocalDate.of(2026, 7, 8), LocalDate.of(2026, 7, 13));
+        List<RentalRecord> records = new ArrayList<>();
+        records.add(record);
+        
+        when(rentalRepository.findAll()).thenReturn(records);
+        when(customerRepository.findById("UNKNOWN_CUST")).thenReturn(Optional.empty());
+        when(dateTimeService.getCurrentDate()).thenReturn(LocalDate.of(2026, 7, 15)); 
+
+        assertDoesNotThrow(() -> rentalService.generateExpiryReminders());
+        verify(rentalObserver, never()).onExpiryReminderSent(any(), any(), any());
+    }
 }
